@@ -11,10 +11,10 @@ import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import kotlinx.android.synthetic.main.apps_list.*
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
+import tech.httptoolkit.android.databinding.AppsListBinding
 
 // Used to both to send and return the current list of selected apps
 const val UNSELECTED_APPS_EXTRA = "tech.httptoolkit.android.UNSELECTED_APPS_EXTRA"
@@ -30,23 +30,24 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
     private var showSystem = false
     private var showEnabledOnly = false
     private var textFilter = ""
-
+    private lateinit var binding: AppsListBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.apps_list)
+        binding = AppsListBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
 
         blockedPackages = intent.getStringArrayExtra(UNSELECTED_APPS_EXTRA)!!.toHashSet()
-
-        apps_list_recyclerView.adapter =
+        binding.appsListRecyclerView.adapter =
             ApplicationListAdapter(
                 filteredApps,
                 ::isAppEnabled,
                 ::setAppEnabled
             )
-        apps_list_swipeRefreshLayout.setOnRefreshListener(this)
-        apps_list_more_menu.setOnClickListener(this)
-
-        apps_list_filterEditText.doAfterTextChanged {
+        binding.appsListSwipeRefreshLayout.setOnRefreshListener(this)
+        binding.appsListMoreMenu.setOnClickListener(this)
+        binding.appsListFilterEditText.doAfterTextChanged {
             textFilter = it.toString()
             applyFilters()
         }
@@ -56,8 +57,8 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
 
     override fun onRefresh() {
         launch(Dispatchers.Main) {
-            if (apps_list_swipeRefreshLayout.isRefreshing.not()) {
-                apps_list_swipeRefreshLayout.isRefreshing = true
+            if (binding.appsListSwipeRefreshLayout.isRefreshing.not()) {
+                binding.appsListSwipeRefreshLayout.isRefreshing = true
             }
 
             val apps = loadAllApps()
@@ -65,14 +66,14 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
             allApps.addAll(apps)
             applyFilters()
 
-            apps_list_swipeRefreshLayout.isRefreshing = false
+            binding.appsListSwipeRefreshLayout.isRefreshing = false
         }
     }
 
     private fun applyFilters() {
         filteredApps.clear()
         filteredApps.addAll(allApps.filter(::matchesFilters))
-        apps_list_recyclerView.adapter?.notifyDataSetChanged()
+        binding.appsListRecyclerView.adapter?.notifyDataSetChanged()
     }
 
     private fun matchesFilters(app: PackageInfo): Boolean {
@@ -81,9 +82,9 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
         val isSystemApp = appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1
 
         return (textFilter.isEmpty() || appLabel.contains(textFilter, true)) && // Filter by name
-            (showSystem || !isSystemApp) && // Show system apps, if that's active
-            (!showEnabledOnly || isAppEnabled(app)) && // Only show enabled apps, if that's active
-            app.packageName != packageName // Never show ourselves
+                (showSystem || !isSystemApp) && // Show system apps, if that's active
+                (!showEnabledOnly || isAppEnabled(app)) && // Only show enabled apps, if that's active
+                app.packageName != packageName // Never show ourselves
     }
 
     private fun isAppEnabled(app: PackageInfo): Boolean {
@@ -102,13 +103,14 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
 
     private suspend fun loadAllApps(): List<PackageInfo> =
         withContext(Dispatchers.IO) {
-            return@withContext packageManager.getInstalledPackages(PackageManager.GET_META_DATA).apply {
-                sortBy { pkg ->
-                    AppLabelCache.getAppLabel(packageManager, pkg.applicationInfo).toUpperCase(
-                        Locale.getDefault()
-                    )
+            return@withContext packageManager.getInstalledPackages(PackageManager.GET_META_DATA)
+                .apply {
+                    sortBy { pkg ->
+                        AppLabelCache.getAppLabel(packageManager, pkg.applicationInfo).uppercase(
+                            Locale.getDefault()
+                        )
+                    }
                 }
-            }
         }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
@@ -118,11 +120,13 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
                 applyFilters()
                 true
             }
+
             R.id.action_show_enabled -> {
                 showEnabledOnly = showEnabledOnly.not()
                 applyFilters()
                 true
             }
+
             R.id.action_toggle_all -> {
                 if (blockedPackages.isEmpty()) {
                     // If everything is enabled, disable everything
@@ -135,10 +139,11 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
                 if (showEnabledOnly) {
                     applyFilters()
                 } else {
-                    apps_list_recyclerView.adapter?.notifyDataSetChanged()
+                    binding.appsListRecyclerView.adapter?.notifyDataSetChanged()
                 }
                 true
             }
+
             else -> false
         }
     }
@@ -146,7 +151,7 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.apps_list_more_menu -> {
-                PopupMenu(this, apps_list_more_menu).apply {
+                PopupMenu(this, binding.appsListMoreMenu).apply {
                     this.inflate(R.menu.menu_app_list)
                     this.menu.findItem(R.id.action_show_system).isChecked = showSystem
                     this.menu.findItem(R.id.action_show_enabled).isChecked = showEnabledOnly
@@ -162,11 +167,15 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun onBackPressed() {
-        setResult(RESULT_OK, Intent().putExtra(
-            UNSELECTED_APPS_EXTRA,
-            blockedPackages.toTypedArray()
-        ))
+        super.onBackPressed()
+        setResult(
+            RESULT_OK, Intent().putExtra(
+                UNSELECTED_APPS_EXTRA,
+                blockedPackages.toTypedArray()
+            )
+        )
         finish()
     }
 }

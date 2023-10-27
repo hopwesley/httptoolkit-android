@@ -10,7 +10,6 @@ import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResp
 import com.android.installreferrer.api.InstallReferrerStateListener
 import com.beust.klaxon.Klaxon
 import io.sentry.Sentry
-import io.sentry.android.AndroidSentryClientFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.swiftzer.semver.SemVer
@@ -68,7 +67,7 @@ class HttpToolkitApplication : Application() {
         }
 
         if (BuildConfig.SENTRY_DSN != null) {
-            Sentry.init(BuildConfig.SENTRY_DSN, AndroidSentryClientFactory(this))
+            Sentry.init(BuildConfig.SENTRY_DSN)
         }
 
         // Check if we've been recreated unexpectedly, with no crashes in the meantime:
@@ -77,7 +76,7 @@ class HttpToolkitApplication : Application() {
 
         vpnWasKilled = vpnShouldBeRunning && !isVpnActive() && !appCrashed && !isProbablyEmulator
         if (vpnWasKilled) {
-            Sentry.capture("VPN killed in the background")
+            Sentry.captureMessage("VPN killed in the background")
             // The UI will show an alert next time the MainActivity is created.
         }
 

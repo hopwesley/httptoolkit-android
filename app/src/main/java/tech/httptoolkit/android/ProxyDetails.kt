@@ -2,7 +2,6 @@ package tech.httptoolkit.android
 
 import android.os.Parcelable
 import android.util.Base64
-import android.util.Log
 import com.beust.klaxon.Converter
 import com.beust.klaxon.Json
 import com.beust.klaxon.JsonValue
