@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature
@@ -10,57 +9,60 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.CAMERA" android:required="false"/>
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission
+            android:name="android.permission.CAMERA"
+            android:required="false" />
+    <uses-permission
+            android:name="android.permission.QUERY_ALL_PACKAGES"
             tools:ignore="QueryAllPackagesPermission" />
 
-    <uses-permission
-            android:name="android.permission.READ_PHONE_STATE"
-            tools:node="remove" />
-    <uses-permission
-            android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-            tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+            android:maxSdkVersion="32" />
 
     <application
             android:name=".HttpToolkitApplication"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
+            android:largeHeap="true"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
-            tools:targetApi="m" android:usesCleartextTraffic="true"
-            android:largeHeap="true">
+            android:usesCleartextTraffic="true"
+            tools:targetApi="m">
         <service
-            android:name=".ProxyVpnService"
-            android:permission="android.permission.BIND_VPN_SERVICE"
-            android:exported="true">
+                android:name=".ProxyVpnService"
+                android:exported="true"
+                android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
-                <action android:name="android.net.VpnService"/>
-                <action android:name="tech.httptoolkit.android.ProxyVpnService"/>
+                <action android:name="android.net.VpnService" />
+                <action android:name="tech.httptoolkit.android.ProxyVpnService" />
             </intent-filter>
         </service>
 
         <activity
                 android:name=".MainActivity"
-                android:launchMode="singleTask"
-                android:exported="true">
+                android:exported="true"
+                android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <intent-filter
-                    tools:targetApi="m" android:autoVerify="true"
-                    >
+                    android:autoVerify="true"
+                    tools:targetApi="m">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="https"
+                <data
                         android:host="android.httptoolkit.tech"
-                        android:pathPrefix="/connect" />
+                        android:pathPrefix="/connect"
+                        android:scheme="https" />
             </intent-filter>
         </activity>
 
@@ -73,16 +75,17 @@
         -->
         <activity-alias
                 android:name=".RemoteControlMainActivity"
-                android:targetActivity=".MainActivity"
+                android:exported="true"
                 android:permission="android.permission.INJECT_EVENTS"
-                android:exported="true">
+                android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="tech.httptoolkit.android.ACTIVATE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="https"
+                <data
                         android:host="android.httptoolkit.tech"
-                        android:pathPrefix="/connect" />
+                        android:pathPrefix="/connect"
+                        android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="tech.httptoolkit.android.DEACTIVATE" />
@@ -90,16 +93,22 @@
             </intent-filter>
         </activity-alias>
 
-        <activity android:name=".ScanActivity" android:parentActivityName=".MainActivity">
+        <activity
+                android:name=".ScanActivity"
+                android:parentActivityName=".MainActivity">
             <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".MainActivity" />
         </activity>
 
         <activity android:name=".ApplicationListActivity" />
         <activity android:name=".PortListActivity" />
 
-        <meta-data android:name="search-engine" android:resource="@xml/noindex" />
-        <meta-data android:name="io.sentry.auto-init" android:value="false" />
+        <meta-data
+                android:name="search-engine"
+                android:resource="@xml/noindex" />
+        <meta-data
+                android:name="io.sentry.auto-init"
+                android:value="false" />
     </application>
 </manifest>

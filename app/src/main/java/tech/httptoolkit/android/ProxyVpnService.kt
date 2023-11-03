@@ -306,5 +306,4 @@ class ProxyVpnService : VpnService(), IProtectSocket {
     fun isActive(): Boolean {
         return this.vpnInterface != null
     }
-
 }

@@ -97,7 +97,7 @@ class PortListActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         binding.portsListRecyclerView.adapter?.notifyDataSetChanged()
     }
 
-    @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
     override fun onBackPressed() {
         super.onBackPressed()
         setResult(RESULT_OK, Intent().putExtra(

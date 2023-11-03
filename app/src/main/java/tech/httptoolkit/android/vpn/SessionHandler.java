@@ -153,7 +153,6 @@ public class SessionHandler {
 				} else if (!tcpheader.isRST()) {
 					sendRstPacket(ipHeader, tcpheader, dataLength);
 				}
-
 				return;
 			}
 

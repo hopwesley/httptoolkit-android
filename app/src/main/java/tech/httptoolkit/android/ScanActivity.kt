@@ -38,7 +38,6 @@ class ScanActivity : AppCompatActivity(), ZXingScannerView.ResultHandler {
 
     public override fun onResume() {
         super.onResume()
-
         scannerView!!.setResultHandler(this)
         scannerView!!.startCamera()
     }

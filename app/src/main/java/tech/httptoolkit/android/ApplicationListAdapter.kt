@@ -23,7 +23,7 @@ class ApplicationListAdapter(
         holder.bind(data[position])
     }
 
-    inner class AppsViewHolder(val binding: ItemAppRowBinding) :
+    inner class AppsViewHolder(private val binding: ItemAppRowBinding) :
         RecyclerView.ViewHolder(binding.root) {
         private val packageManager by lazy {
             itemView.context.packageManager

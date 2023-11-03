@@ -125,5 +125,4 @@ class ProxyVpnRunnable(
             Log.w(TAG, "Vpn runnable stopped, but it's not running")
         }
     }
-
 }

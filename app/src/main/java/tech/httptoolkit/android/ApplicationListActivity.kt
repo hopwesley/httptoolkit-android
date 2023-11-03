@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -15,7 +16,6 @@ import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.ArrayList
 import tech.httptoolkit.android.databinding.AppsListBinding
-
 // Used to both to send and return the current list of selected apps
 const val UNSELECTED_APPS_EXTRA = "tech.httptoolkit.android.UNSELECTED_APPS_EXTRA"
 
@@ -52,6 +52,17 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
             applyFilters()
         }
 
+        onBackPressedDispatcher.addCallback(this ,object: OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                setResult(
+                    RESULT_OK, Intent().putExtra(
+                        UNSELECTED_APPS_EXTRA,
+                        blockedPackages.toTypedArray()
+                    )
+                )
+                finish()
+            }
+        })
         onRefresh()
     }
 
@@ -165,17 +176,5 @@ class ApplicationListActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefres
                 }.show()
             }
         }
-    }
-
-    @Suppress("DEPRECATION")
-    override fun onBackPressed() {
-        super.onBackPressed()
-        setResult(
-            RESULT_OK, Intent().putExtra(
-                UNSELECTED_APPS_EXTRA,
-                blockedPackages.toTypedArray()
-            )
-        )
-        finish()
     }
 }
